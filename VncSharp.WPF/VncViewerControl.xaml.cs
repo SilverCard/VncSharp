@@ -57,7 +57,7 @@ namespace VncSharp.WPF
         /// </summary>
         public int Depth { get; set; }
         
-        public const String CursorName = "vnccursor";
+        public const String CursorName = "VncCursor";
 
         public Cursor VncCursor { get; private set; }
 
