@@ -59,7 +59,7 @@ namespace VncSharp.WPF
         private int _VncPort = 5900;                         // The port to connectFromClient to on remote host (5900 is default)
         private bool passwordPending = false;            // After Connect() is called, a password might be required.
         private bool fullScreenRefresh = false;		     // Whether or not to request the entire remote screen be sent.
-        private VncDesktopTransformPolicy desktopPolicy;
+
         private RuntimeState state = RuntimeState.Disconnected;
 
         [DefaultValue(0)]
@@ -123,12 +123,8 @@ namespace VncSharp.WPF
         {
             InitializeComponent();
 
-            // Use a simple desktop policy for design mode.  This will be replaced in Connect()
-            desktopPolicy = new VncDesignModeDesktopPolicy(this);
-
             // EventHandler Settings
             VncImage.SizeChanged += new SizeChangedEventHandler(SizeChangedEventHandler);
-
             VncCursor = ((TextBlock)this.Resources[CursorName]).Cursor;
         }
 
@@ -270,9 +266,8 @@ namespace VncSharp.WPF
         /// Connect to a VNC Host and determine whether or not the server requires a password.
         /// </summary>
         /// <param name="host">The IP Address or Host Name of the VNC Host.</param>
+        /// <param name="password">Password for authentication.</param>
         /// <param name="display">The Display number (used on Unix hosts).</param>
-        /// <param name="viewOnly">Determines whether mouse and keyboard events will be sent to the host.</param>
-        /// <param name="scaled">Determines whether to use desktop scaling or leave it normal and clip.</param>
         /// <exception cref="System.ArgumentNullException">Thrown if host is null.</exception>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown if display is negative.</exception>
         /// <exception cref="System.InvalidOperationException">Thrown if the RemoteDesktop control is already Connected.  See <see cref="VncSharpWpf.RemoteDesktop.IsConnected" />.</exception>
@@ -303,8 +298,6 @@ namespace VncSharp.WPF
                 ShowLabelText(ex.Message);
                 throw;
             }
-
-            desktopPolicy = new VncWpfDesktopPolicy(_VncClient, this);
 
             if (passwordPending)
             {

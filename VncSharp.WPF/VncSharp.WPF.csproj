@@ -51,13 +51,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VncWpfDesktopPolicy.cs" />
     <Page Include="VncViewerControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="VncDesignModeDesktopPolicy.cs" />
-    <Compile Include="VncDesktopTransformPolicy.cs" />
     <Compile Include="VncViewerControl.xaml.cs">
       <DependentUpon>VncViewerControl.xaml</DependentUpon>
       <SubType>Code</SubType>
