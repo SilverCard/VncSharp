@@ -418,7 +418,8 @@ namespace VncSharp
                     RequestScreenUpdate(FullScreenRefresh);
                     connLostCount = 0;
                     
-                } catch
+                }
+                catch (Exception)
                 {   // On the first time of no data being received we force a complete update
                     // This is for times when the server has no update, and caused the timeout.
                     if (connLostCount++ > 1)

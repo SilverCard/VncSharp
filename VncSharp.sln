@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VncSharp", "VncSharp\VncSharp.csproj", "{9B26D36D-7A16-4640-9600-BAC397F83E7D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VncSharp.WPF", "VncSharp.WPF\VncSharp.WPF.csproj", "{A64C1541-9D21-4719-9D02-695169FEB9AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VncViewer", "VncViewer\VncViewer.csproj", "{F5A5C377-72BE-42CA-83BF-5C648137227D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{9B26D36D-7A16-4640-9600-BAC397F83E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B26D36D-7A16-4640-9600-BAC397F83E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B26D36D-7A16-4640-9600-BAC397F83E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A64C1541-9D21-4719-9D02-695169FEB9AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A64C1541-9D21-4719-9D02-695169FEB9AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A64C1541-9D21-4719-9D02-695169FEB9AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A64C1541-9D21-4719-9D02-695169FEB9AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
