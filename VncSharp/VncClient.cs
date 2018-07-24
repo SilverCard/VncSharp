@@ -18,11 +18,9 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Media;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 // ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable ArrangeAccessorOwnerBody
 
@@ -399,25 +397,16 @@ namespace VncSharp
                                 if (CheckIfThreadDone() || VncUpdate == null) continue;
                                 var e = new VncEventArgs(er);
 
-                                // In order to play nicely with WinForms controls, we do a check here to 
-                                // see if it is necessary to synchronize this event with the UI thread.
-                                var control = VncUpdate.Target as Control;
-                                if (control != null) {
-                                    control.Invoke(VncUpdate, this, e);
-                                } else {
-                                    // Target is not a WinForms control, so do it on this thread...
-                                    VncUpdate(this, new VncEventArgs(er));
-                                }
+                                VncUpdate(this, new VncEventArgs(er));
                             }
                             break;
                         case RfbProtocol.BELL:
-                            Beep();
+                            //Beep();
                             break;
                         case RfbProtocol.SERVER_CUT_TEXT:
                             if (CheckIfThreadDone())
                                 break;
                             // TODO: This is invasive, should there be a bool property allowing this message to be ignored?
-                            Clipboard.SetDataObject(rfb.ReadServerCutText().Replace("\n", Environment.NewLine), true);
                             OnServerCutText();
                             break;
                         case RfbProtocol.SET_COLOUR_MAP_ENTRIES:
@@ -443,44 +432,13 @@ namespace VncSharp
 
 	    private void OnConnectionLost()
 		{
-			// In order to play nicely with WinForms controls, we do a check here to 
-			// see if it is necessary to synchronize this event with the UI thread.
-		    if (!(ConnectionLost?.Target is Control)) return;
-		    var target = (Control) ConnectionLost.Target;
-
-		    if (target != null)
-		        target.Invoke(ConnectionLost, this, EventArgs.Empty);
-		    else
-		        ConnectionLost(this, EventArgs.Empty);
-		}
+            ConnectionLost(this, EventArgs.Empty);
+        }
 
 	    private void OnServerCutText()
         {
-            // In order to play nicely with WinForms controls, we do a check here to 
-            // see if it is necessary to synchronize this event with the UI thread.
-            if (!(ServerCutText?.Target is Control)) return;
-            var target = (Control) ServerCutText.Target;
-
-            if (target != null)
-                target.Invoke(ServerCutText, this, EventArgs.Empty);
-            else
-                ServerCutText(this, EventArgs.Empty);
+            ServerCutText(this, EventArgs.Empty);
         }
-
-// There is no managed way to get a system beep (until Framework v.2.0). So depending on the platform, something external has to be called.
-#if Win32
-	    private static void Beep()
-	    {
-            SystemSounds.Beep.Play();
-        }
-#else
-		private void Beep()	// bool just so it matches the NativeMethods API signature
-		{
-			// TODO: How to do this under Unix?
-			System.Console.Write("Beep!");
-			return true;
-		}
-#endif
 
         public void WriteClientCutText(string text)
         {
