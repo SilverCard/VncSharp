@@ -4,8 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <ApplicationIcon>vncviewer.ico</ApplicationIcon>
     <Description>.NET Standard VNC Client Library</Description>
-    <Company>David Humphrey</Company>
-    <Copyright>GPL 2</Copyright>
+    <Company></Company>
+    <Copyright>Copyright (C) 2018 Ricardo Brito; Copyright (C) 2008 David Humphrey</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

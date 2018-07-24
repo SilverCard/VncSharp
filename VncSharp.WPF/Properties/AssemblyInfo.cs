@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("VncSharp.WPF")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright (C) 2008 David Humphrey; Copyright (C) 2011 Masanori Nakano; Copyright (C) 2018 Ricardo Brito")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

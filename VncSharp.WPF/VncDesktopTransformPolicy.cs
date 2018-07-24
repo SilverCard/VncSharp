@@ -1,6 +1,8 @@
-// VncSharpWPF - .NET VNC Client for WPF Library
-// Copyright (C) 2008 David Humphrey
+// VncSharp.WPF
+// Copyright (C) 2018 Ricardo Brito 
 // Copyright (C) 2011 Masanori Nakano (Modified VncSharp for WPF)
+// Copyright (C) 2008 David Humphrey
+//
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
