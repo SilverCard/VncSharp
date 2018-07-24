@@ -433,12 +433,12 @@ namespace VncSharp
 
 	    private void OnConnectionLost()
 		{
-            ConnectionLost(this, EventArgs.Empty);
+            ConnectionLost?.Invoke(this, EventArgs.Empty);
         }
 
 	    private void OnServerCutText()
         {
-            ServerCutText(this, EventArgs.Empty);
+            ServerCutText?.Invoke(this, EventArgs.Empty);
         }
 
         public void WriteClientCutText(string text)
