@@ -28,13 +28,14 @@ namespace VncSharp.Encodings
 	{
 		protected RfbProtocol	rfb;
 		protected Rectangle		rectangle;
-		protected Framebuffer	framebuffer;
 		protected PixelReader	preader;
 
-		public EncodedRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle, int encoding)
+        public Framebuffer Framebuffer { get; private set; }
+
+        public EncodedRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle, int encoding)
 		{
 			this.rfb = rfb;
-			this.framebuffer = framebuffer;
+			Framebuffer = framebuffer;
 			this.rectangle = rectangle;
 
 			//Select appropriate reader
@@ -105,7 +106,7 @@ namespace VncSharp.Encodings
 					row = y * rectangle.Width;
 
 					for (var x = 0; x < rectangle.Width; ++x) {
-						*pInt++ = framebuffer[row + x];
+						*pInt++ = Framebuffer[row + x];
 					}
 
 					// Move pointer to beginning of next row in rectangle
@@ -136,7 +137,7 @@ namespace VncSharp.Encodings
 
 			for (var y = 0; y < rect.Height; ++y) {
 				for (var x = 0; x < rect.Width; ++x) {
-					framebuffer[ptr++] = colour;			// colour every pixel the same
+					Framebuffer[ptr++] = colour;			// colour every pixel the same
 				}
 				ptr += offset;								// advance to next row within pixels
 			}
@@ -157,7 +158,7 @@ namespace VncSharp.Encodings
 			var idx = 0;
 			for (var y = 0; y < rect.Height; ++y) {
 				for (var x = 0; x < rect.Width; ++x) {
-					framebuffer[ptr++] = tile[idx++];
+					Framebuffer[ptr++] = tile[idx++];
 				}
 				ptr += offset;								// advance to next row within pixels
 			}
@@ -181,7 +182,7 @@ namespace VncSharp.Encodings
 
 			for (var y = 0; y < rect.Height; ++y) {
 				for (var x = 0; x < rect.Width; ++x) {
-					framebuffer[ptr++] = preader.ReadPixel();	// every pixel needs to be read from server
+					Framebuffer[ptr++] = preader.ReadPixel();	// every pixel needs to be read from server
 				}
 				ptr += offset;								    // advance to next row within pixels
 			}

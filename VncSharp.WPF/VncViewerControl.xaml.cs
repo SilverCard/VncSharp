@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Threading.Tasks;
 using System.Drawing.Imaging;
+using VncSharp.Encodings;
 
 namespace VncSharp.WPF
 {
@@ -54,8 +55,6 @@ namespace VncSharp.WPF
         /// </summary>
         public event EventHandler ConnectionLost;
 
-        private Bitmap _VncImage;
-
         private VncClient _VncClient;                           // The Client object handling all protocol-level interaction
         private int _VncPort = 5900;                         // The port to connectFromClient to on remote host (5900 is default)
         private bool passwordPending = false;            // After Connect() is called, a password might be required.
@@ -76,7 +75,7 @@ namespace VncSharp.WPF
         /// Sets the Colour Depth of the Framebuffer--one of 3, 6, 8, or 16
         /// </summary>
         public int Depth { get; set; }
-        
+
         public const String CursorName = "VncCursor";
 
         public Cursor VncCursor { get; private set; }
@@ -192,16 +191,56 @@ namespace VncSharp.WPF
                     throw new InvalidOperationException("RemoteDesktop cannot be in Connected state when calling methods that establish a connection.");
                 }
             }
-        }      
-        
-        private void UpdateImage()
-        {
-            Dispatcher.Invoke(() => {
+        }
 
-                var data = _VncImage.LockBits(new Rectangle(0, 0, _VncClient.Framebuffer.Width, _VncClient.Framebuffer.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var s = Math.Abs(data.Stride * data.Height);
-                VncImageSource.WritePixels(new Int32Rect(0, 0, _VncClient.Framebuffer.Width, _VncClient.Framebuffer.Height), data.Scan0, s, data.Stride);
-                _VncImage.UnlockBits(data);
+        //private void UpdateImage()
+        //{
+        //    Dispatcher.Invoke(() => {
+
+        //        var data = _VncImage.LockBits(new Rectangle(0, 0, _VncClient.Framebuffer.Width, _VncClient.Framebuffer.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        //        var s = Math.Abs(data.Stride * data.Height);
+        //        VncImageSource.WritePixels(new Int32Rect(0, 0, _VncClient.Framebuffer.Width, _VncClient.Framebuffer.Height), data.Scan0, s, data.Stride);
+        //        _VncImage.UnlockBits(data);
+        //    });
+        //}
+
+
+        private void DrawCopyRectRectangle(CopyRectRectangle cpRect)
+        {
+            var r = cpRect.UpdateRectangle;
+            var p = cpRect.Source;
+            var f = cpRect.Framebuffer;
+
+            Dispatcher.Invoke(() =>
+            {
+                // Avoid exception if window is dragged bottom of screen
+                if (r.Top + r.Height >= f.Height)
+                {
+                    r.Height = f.Height - r.Top - 1;
+                }
+
+                if ((r.Y * VncImageSource.PixelWidth + r.X) < (p.Y * VncImageSource.PixelWidth + p.X))
+                {
+                    Int32Rect srcRect = new Int32Rect(p.X, p.Y, r.Width, r.Height);
+                    VncImageSource.WritePixels(srcRect, VncImageSource.BackBuffer, VncImageSource.BackBufferStride * VncImageSource.PixelHeight, VncImageSource.PixelWidth * 4, r.X, r.Y);
+                }
+                else
+                {
+                    Int32[] pixelBuf = new Int32[r.Width * r.Height];
+
+                    VncImageSource.CopyPixels(new Int32Rect(p.X, p.Y, r.Width, r.Height), pixelBuf, r.Width * 4, 0);
+                    VncImageSource.WritePixels(new Int32Rect(0, 0, r.Width, r.Height), pixelBuf, r.Width * 4, r.X, r.Y);
+                }
+            });
+        }
+
+        private void DrawEncodedRectangle(EncodedRectangle r)
+        {
+            var ur = r.UpdateRectangle;
+
+            Dispatcher.Invoke(() =>
+            {
+                VncImageSource.WritePixels(new Int32Rect(0, 0, ur.Width, ur.Height), r.Framebuffer.pixels, ur.Width * 4, ur.X, ur.Y);
             });
         }
 
@@ -211,9 +250,12 @@ namespace VncSharp.WPF
         // The VncClient object handles thread marshalling onto the UI thread.
         protected void VncUpdate(object sender, VncEventArgs e)
         {
-            e.DesktopUpdater.Draw(_VncImage);
-            UpdateImage();
+            var du = e.DesktopUpdater;
 
+            if (du is CopyRectRectangle) DrawCopyRectRectangle((CopyRectRectangle)du);
+            else if (du is EncodedRectangle) DrawEncodedRectangle((EncodedRectangle)du);
+            else throw new NotImplementedException("Drawing of this encoding is not implemented.");     
+            
             if (state == RuntimeState.Connected)
             {
                 _VncClient.RequestScreenUpdate(fullScreenRefresh);
@@ -353,15 +395,13 @@ namespace VncSharp.WPF
             // remote framebuffer, and 32bpp pixel format (doesn't matter what the server is sending--8,16,
             // or 32--we always draw 32bpp here for efficiency).
             //desktop = new Bitmap(vnc.Framebuffer.Width, vnc.Framebuffer.Height, PixelFormat.Format32bppPArgb);
-            
+
             List<System.Windows.Media.Color> colors = new List<System.Windows.Media.Color>() {
             System.Windows.Media.Colors.Red,
             System.Windows.Media.Colors.Blue,
             System.Windows.Media.Colors.Green};
 
             BitmapPalette myPalette = new BitmapPalette(colors);
-
-            _VncImage = new Bitmap(_VncClient.Framebuffer.Width, _VncClient.Framebuffer.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
 
             Dispatcher.Invoke(new Action(() =>
             {

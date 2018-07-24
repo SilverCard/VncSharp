@@ -31,17 +31,19 @@ namespace VncSharp.Encodings
 		}
 
 		// CopyRect Source Point (x,y) from which to copy pixels in Draw
-	    private Point source;
+	    public Point Source { get; private set; }
 
 		/// <summary>
 		/// Decodes a CopyRect encoded rectangle.
 		/// </summary>
 		public override void Decode()
 		{
-			// Read the source point from which to begin copying pixels
-			source = new Point();
-			source.X = rfb.ReadUInt16();
-			source.Y = rfb.ReadUInt16();
+            // Read the source point from which to begin copying pixels
+            Source = new Point()
+            {
+                X = rfb.ReadUInt16(),
+                Y = rfb.ReadUInt16()
+            };
 		}
 
 		public unsafe override void Draw(Bitmap desktop)
@@ -53,9 +55,9 @@ namespace VncSharp.Encodings
 
 			
 			// Avoid exception if window is dragged bottom of screen
-			if (rectangle.Top + rectangle.Height >= framebuffer.Height)
+			if (rectangle.Top + rectangle.Height >= Framebuffer.Height)
 			{
-				rectangle.Height = framebuffer.Height - rectangle.Top - 1;
+				rectangle.Height = Framebuffer.Height - rectangle.Top - 1;
 			}
 
 			try {
@@ -66,7 +68,7 @@ namespace VncSharp.Encodings
                 var nonCopiedPixelStride = desktop.Width - rectangle.Width;
 
                 // Move source and destination pointers
-                pSrc += source.Y * desktop.Width + source.X;
+                pSrc += Source.Y * desktop.Width + Source.X;
                 pDest += rectangle.Y * desktop.Width + rectangle.X;
 
                 // BUG FIX (Peter Wentworth) EPW:  we need to guard against overwriting old pixels before

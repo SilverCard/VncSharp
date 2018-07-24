@@ -28,7 +28,7 @@ namespace VncSharp
 	{
 	    private string name;
 
-	    private readonly int[] pixels;   // I'm reusing the same pixel buffer for all update rectangles.
+	    public int[] pixels { get; private set; }  // I'm reusing the same pixel buffer for all update rectangles.
                                          // Pixel values will always be 32-bits to match GDI representation
 
 
