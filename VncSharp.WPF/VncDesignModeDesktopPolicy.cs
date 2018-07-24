@@ -17,7 +17,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 using System;
-//using System.Windows.Forms;
 using System.Drawing;
 
 namespace VncSharp.WPF
@@ -27,9 +26,10 @@ namespace VncSharp.WPF
 	/// </summary>
 	public sealed class VncDesignModeDesktopPolicy : VncDesktopTransformPolicy
 	{
-        public VncDesignModeDesktopPolicy(VncViewerControl remoteDesktop) 
-            : base(null, remoteDesktop)
+        public VncDesignModeDesktopPolicy(VncViewerControl control)
+            : base(null, control)
         {
+            if (control == null) throw new ArgumentNullException(nameof(control));
         }
 
         public override bool AutoScroll => true;

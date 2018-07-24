@@ -9,7 +9,7 @@
         <TextBlock x:Key="VncCursor" Cursor="Resources/vnccursor.cur"/>
     </UserControl.Resources>
     <Grid>
-        <Label Name="waitLabel" Content="Connecting to VNC host, please wait..." Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Visibility="Hidden" FontSize="14" Panel.ZIndex="1" />
+        <Label Name="Label" Content="Connecting to VNC host, please wait..." Foreground="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Visibility="Hidden" FontSize="14" Panel.ZIndex="1" />
         <Image Name="VncImage" Panel.ZIndex="10" />
     </Grid>
 </UserControl>

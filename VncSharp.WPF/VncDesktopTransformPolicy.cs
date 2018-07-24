@@ -21,28 +21,20 @@ using System.Drawing;
 
 namespace VncSharp.WPF
 {
-	/// <summary>
-	/// Base class for desktop clipping/scaling policies.  Used by RemoteDesktop.
-	/// </summary>
-	public abstract class VncDesktopTransformPolicy
+    /// <summary>
+    /// Base class for desktop clipping/scaling policies.  Used by RemoteDesktop.
+    /// </summary>
+    public abstract class VncDesktopTransformPolicy
 	{
-        protected VncClient vnc;
-        protected VncViewerControl remoteDesktop;
+        protected VncClient _Vnc;
+        protected VncViewerControl _ViewerControl;
 
-        public VncDesktopTransformPolicy(VncClient vnc, VncViewerControl remoteDesktop)
-        {
-            this.vnc = vnc;
-            this.remoteDesktop = remoteDesktop;
-        }
+        public VncDesktopTransformPolicy(VncClient vnc, VncViewerControl viewerControl) { }
 
         public virtual bool AutoScroll => false;
-
         public abstract Size AutoScrollMinSize { get; }
-
         public abstract Rectangle AdjustUpdateRectangle(Rectangle updateRectangle);
-
         public abstract Point GetMouseMovePoint(Point current);
-
         public abstract Point UpdateRemotePointer(Point current);
     }
 }

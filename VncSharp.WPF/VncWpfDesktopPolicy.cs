@@ -21,26 +21,24 @@ using System.Drawing;
 
 namespace VncSharp.WPF
 {
-	/// <summary>
-	/// A clipped version of VncDesktopTransformPolicy.
-	/// </summary>
-	public sealed class VncWpfDesktopPolicy : VncDesktopTransformPolicy
+    /// <summary>
+    /// A clipped version of VncDesktopTransformPolicy.
+    /// </summary>
+    public sealed class VncWpfDesktopPolicy : VncDesktopTransformPolicy
 	{
-        public VncWpfDesktopPolicy(VncClient vnc, VncViewerControl remoteDesktop) 
+        public VncWpfDesktopPolicy(VncClient vnc, VncViewerControl remoteDesktop)
             : base(vnc, remoteDesktop)
         {
+            if (vnc == null) throw new ArgumentNullException(nameof(vnc));
+            if (remoteDesktop == null) throw new ArgumentNullException(nameof(remoteDesktop));
         }
 
-        public override bool AutoScroll {
-            get {
-                return true;
-            }
-        }
+        public override bool AutoScroll => true; 
 
         public override Size AutoScrollMinSize {
             get {
-                if (vnc != null && vnc.Framebuffer != null) {
-                    return new Size(vnc.Framebuffer.Width, vnc.Framebuffer.Height);
+                if (_Vnc != null && _Vnc.Framebuffer != null) {
+                    return new Size(_Vnc.Framebuffer.Width, _Vnc.Framebuffer.Height);
                 } else {
                     return new Size(100, 100);
                 }
@@ -51,8 +49,8 @@ namespace VncSharp.WPF
         {
             Point adjusted = new Point();
 
-            adjusted.X = (int)((double)current.X / remoteDesktop.ImageScale);
-            adjusted.Y = (int)((double)current.Y / remoteDesktop.ImageScale);
+            adjusted.X = (int)((double)current.X / _ViewerControl.ImageScale);
+            adjusted.Y = (int)((double)current.Y / _ViewerControl.ImageScale);
 
             return adjusted;
         }
@@ -62,18 +60,18 @@ namespace VncSharp.WPF
 			int x, y;
 
 
-            if (remoteDesktop.ActualWidth > remoteDesktop.VncImage.ActualWidth)
+            if (_ViewerControl.ActualWidth > _ViewerControl.VncImage.ActualWidth)
             {
-                x = updateRectangle.X + (int)(remoteDesktop.ActualWidth - remoteDesktop.VncImage.ActualWidth) / 2;
+                x = updateRectangle.X + (int)(_ViewerControl.ActualWidth - _ViewerControl.VncImage.ActualWidth) / 2;
             }
             else
             {
                 x = updateRectangle.X;
             }
 
-            if (remoteDesktop.ActualHeight > remoteDesktop.VncImage.ActualHeight)
+            if (_ViewerControl.ActualHeight > _ViewerControl.VncImage.ActualHeight)
             {
-                y = updateRectangle.Y + (int)(remoteDesktop.ActualHeight - remoteDesktop.VncImage.ActualHeight) / 2;
+                y = updateRectangle.Y + (int)(_ViewerControl.ActualHeight - _ViewerControl.VncImage.ActualHeight) / 2;
             }
             else
             {
