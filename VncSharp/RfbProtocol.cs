@@ -47,15 +47,7 @@ namespace VncSharp
 		public const int SET_COLOUR_MAP_ENTRIES			= 1;
 		public const int BELL 							= 2;
 		public const int SERVER_CUT_TEXT 				= 3;
-
-		// Client to Server Message-Type constants
-		private const byte SET_PIXEL_FORMAT 			= 0;
-		private const byte SET_ENCODINGS 				= 2;
-		private const byte FRAMEBUFFER_UPDATE_REQUEST 	= 3;
-		private const byte KEY_EVENT 					= 4;
-		private const byte POINTER_EVENT 				= 5;
-		private const byte CLIENT_CUT_TEXT 				= 6;
-
+        
         // Keyboard constants
 		public const int XK_BackSpace 	= 0xFF08;
 		public const int XK_Tab 		= 0xFF09;
@@ -406,7 +398,7 @@ namespace VncSharp
 			byte[] buff = new byte[20];
 
 			// Build up the packet
-			buff[0] = SET_PIXEL_FORMAT;
+			buff[0] = (byte)ClientServerMessageType.SetPixelFormat;
 			buff[1] = 0x00;
 			buff[2] = 0x00;
 			buff[3] = 0x00;
@@ -423,7 +415,7 @@ namespace VncSharp
 		{
 			byte[] buff = new byte[(encodings.Length*4) + 4];
 			int x = 0;
-			buff[0] = SET_ENCODINGS;
+			buff[0] = (byte)ClientServerMessageType.SetEncodings;
 			buff[1] = 0x00;
 			BitConverter.GetBytes((ushort)encodings.Length).Reverse().ToArray().CopyTo(buff, 2);
 			
@@ -447,8 +439,8 @@ namespace VncSharp
 		public void WriteFramebufferUpdateRequest(ushort x, ushort y, ushort width, ushort height, bool incremental)
 		{
 			byte[] buff = new byte[10];
-			buff[0] = FRAMEBUFFER_UPDATE_REQUEST;
-			buff[1] = (byte)(incremental ? 1 : 0);
+			buff[0] = (byte)ClientServerMessageType.FramebufferUpdateRequest;
+            buff[1] = (byte)(incremental ? 1 : 0);
 			BitConverter.GetBytes((ushort)x).Reverse().ToArray().CopyTo(buff, 2);
 			BitConverter.GetBytes((ushort)y).Reverse().ToArray().CopyTo(buff, 4);
 			BitConverter.GetBytes((ushort)width).Reverse().ToArray().CopyTo(buff, 6);
@@ -465,7 +457,7 @@ namespace VncSharp
 		public void WriteKeyEvent(uint keysym, bool pressed)
 		{
 			byte[] buff = new byte[8];
-			buff[0] = KEY_EVENT;
+			buff[0] = (byte)ClientServerMessageType.KeyEvent;
 			buff[1] = (byte)(pressed ? 1 : 0);
 			buff[2] = 0x00;
 			buff[3] = 0x00;
@@ -482,8 +474,8 @@ namespace VncSharp
 		public void WritePointerEvent(byte buttonMask, Point point)
 		{
 			byte[] buff = new byte[6];
-			buff[0] = POINTER_EVENT;
-			buff[1] = buttonMask;
+			buff[0] = (byte)ClientServerMessageType.PointerEvent;
+            buff[1] = buttonMask;
 			BitConverter.GetBytes((ushort)point.X).Reverse().ToArray().CopyTo(buff, 2);
 			BitConverter.GetBytes((ushort)point.Y).Reverse().ToArray().CopyTo(buff, 4);
 			writer.Write(buff);
@@ -497,7 +489,7 @@ namespace VncSharp
 		public void WriteClientCutText(string text)
 		{
 			byte[] buff = new byte[text.Length + 8];
-			buff[0] = CLIENT_CUT_TEXT;
+			buff[0] = (byte)ClientServerMessageType.ClientCutText;
 			buff[1] = 0x00;
 			buff[2] = 0x00;
 			buff[3] = 0x00;

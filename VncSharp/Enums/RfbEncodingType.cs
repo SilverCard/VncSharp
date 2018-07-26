@@ -1,17 +1,26 @@
 ﻿namespace VncSharp
 {
+    // See
+    // https://github.com/rfbproto/rfbproto/blob/master/rfbproto.rst#encodings
+
     public enum RfbEncodingType : int
     {
-        Raw =       0x00000000,
-        CopyRect =  0x00000001,
-        RRE =       0x00000002,
-        CoRRE =     0x00000004,
-        Hextile =   0x00000005,
-        Zlib =      0x00000006,
-        Tight =     0x00000007,
-        ZlibHex =   0x00000008,
-        Ultra =     0x00000009,
-        ZRLE =      0x00000010,
-        ZYWRLE =    0x00000011
+        Raw = 0,
+        CopyRect = 1,
+        RRE = 2,
+        CoRRE = 4,
+        Hextile = 5,
+        Zlib = 6,
+        Tight = 7,
+        ZlibHex = 8,
+        Ultra = 9,
+        Ultra2 = 10,
+        TRLE = 15,
+        ZRLE = 16,
+        ZYWRLE = 17,
+        H264 = 20,
+        Jpeg = 21,
+        Jrle = 22,
+        TightPng = -260
     }
 }
