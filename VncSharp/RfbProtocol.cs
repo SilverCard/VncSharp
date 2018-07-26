@@ -42,12 +42,6 @@ namespace VncSharp
 		public const int RECEIVE_TIMEOUT				= 15000;
 		public const int SEND_TIMEOUT					= 15000;
         
-		// Server to Client Message-Type constants
-		public const int FRAMEBUFFER_UPDATE 			= 0;
-		public const int SET_COLOUR_MAP_ENTRIES			= 1;
-		public const int BELL 							= 2;
-		public const int SERVER_CUT_TEXT 				= 3;
-        
         // Keyboard constants
 		public const int XK_BackSpace 	= 0xFF08;
 		public const int XK_Tab 		= 0xFF09;
@@ -503,9 +497,9 @@ namespace VncSharp
 		/// Reads the type of message being sent by the server--all messages are prefixed with a message type.
 		/// </summary>
 		/// <returns>Returns the message type as an integer.</returns>
-		public int ReadServerMessageType()
+		public ServerClientMessageType ReadServerMessageType()
 		{
-			return Reader.ReadByte();
+			return (ServerClientMessageType)Reader.ReadByte();
 		}
 
 		/// <summary>

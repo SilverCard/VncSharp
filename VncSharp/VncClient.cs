@@ -377,8 +377,9 @@ namespace VncSharp
 
                 try {
                     // ReSharper disable once SwitchStatementMissingSomeCases
-                    switch (rfb.ReadServerMessageType()) {
-                        case RfbProtocol.FRAMEBUFFER_UPDATE:
+                    var msgType = rfb.ReadServerMessageType();
+                    switch (msgType) {
+                        case ServerClientMessageType.FramebufferUpdate:
                             var rectangles = rfb.ReadFramebufferUpdate();
 
                             if (CheckIfThreadDone())
@@ -401,16 +402,16 @@ namespace VncSharp
                                 VncUpdate(this, new VncEventArgs(er));
                             }
                             break;
-                        case RfbProtocol.BELL:
+                        case ServerClientMessageType.Bell:
                             //Beep();
                             break;
-                        case RfbProtocol.SERVER_CUT_TEXT:
+                        case ServerClientMessageType.ServerCutText:
                             if (CheckIfThreadDone())
                                 break;
                             // TODO: This is invasive, should there be a bool property allowing this message to be ignored?
                             OnServerCutText();
                             break;
-                        case RfbProtocol.SET_COLOUR_MAP_ENTRIES:
+                        case ServerClientMessageType.SetColourMapEntries:
                             rfb.ReadColourMapEntry();
                             break;
                     }
