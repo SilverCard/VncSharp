@@ -21,6 +21,8 @@ using System.Drawing;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using VncSharp.Encodings;
 // ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable ArrangeAccessorOwnerBody
 
@@ -35,9 +37,8 @@ namespace VncSharp
 	{
 		private RfbProtocol rfb;			// The protocol object handling all communication with server.
 		private byte securityType;			// The type of Security agreed upon by client/server
-		private EncodedRectangleFactory factory;
-		private Thread worker;				// To request and read in-coming updates from server
-		private ManualResetEvent done;		// Used to tell the worker thread to die cleanly
+		private Task _RfbUpdatesTask;				// To request and read in-coming updates from server
+		private CancellationTokenSource _Cts;		// Used to tell the worker thread to die cleanly
 		private IVncInputPolicy inputPolicy;// A mouse/keyboard input strategy
 		private bool viewOnlyMode = false;
 
@@ -308,24 +309,17 @@ namespace VncSharp
                                                             RfbEncodingType.CopyRect,
                                                             RfbEncodingType.Raw });
 
-			rfb.WriteSetPixelFormat(Framebuffer);	// set the required ramebuffer format
-            
-			// Create an EncodedRectangleFactory so that EncodedRectangles can be built according to set pixel layout
-			factory = new EncodedRectangleFactory(rfb, Framebuffer);
+			rfb.WriteSetPixelFormat(Framebuffer);	// set the required ramebuffer format            
+		
 		}
 
 		/// <summary>
 		/// Begin getting updates from the VNC Server.  This will continue until StopUpdates() is called.  NOTE: this must be called after Connect().
 		/// </summary>
 		public void StartUpdates()
-		{
-			// Start getting updates on background thread.
-			worker = new Thread(GetRfbUpdates);
-            // Bug Fix (Grégoire Pailler) for clipboard and threading
-            worker.SetApartmentState(ApartmentState.STA);
-            worker.IsBackground = true;
-			done = new ManualResetEvent(false);
-			worker.Start();
+		{		
+            _Cts = new CancellationTokenSource();
+            _RfbUpdatesTask = Task.Factory.StartNew(() => GetRfbUpdates(_Cts.Token), TaskCreationOptions.LongRunning).ContinueWith((t) => _Cts.Dispose());
 		}
 
 		/// <summary>
@@ -333,9 +327,7 @@ namespace VncSharp
 		/// </summary>
 		public void Disconnect()
 		{
-			// Stop the worker thread.
-			if (done != null)
-				done.Set();
+            _Cts?.Cancel();
 
 			// BUG FIX: Simon.Phillips@warwick.ac.uk for UltraVNC disconnect issue
 			// Request a tiny screen update to flush the blocking read
@@ -345,8 +337,8 @@ namespace VncSharp
 				// this may not work, as Disconnect can get called in response to the
 				// VncClient raising a ConnectionLost event (e.g., the remote host died).
 			}
-			if (worker != null)
-				worker.Join(3000);	// this number is arbitrary, just so that it doesn't block forever....
+
+            _RfbUpdatesTask?.Wait(10000);
 
 			rfb.Close();	
 			rfb = null;
@@ -355,25 +347,20 @@ namespace VncSharp
 		/// <summary>
 		/// An event that occurs whenever the server sends a Framebuffer Update.
 		/// </summary>
-		public event VncUpdateHandler VncUpdate;
-		
-		private bool CheckIfThreadDone()
-		{
-			return done.WaitOne(0, false);
-		}
-		
+		public event VncUpdateHandler VncUpdate;	
+        		
 		/// <summary>
 		/// Worker thread lives here and processes protocol messages infinitely, triggering events or other actions as necessary.
 		/// </summary>
-		private void GetRfbUpdates()
+		private void GetRfbUpdates(CancellationToken token)
 		{
 			// Get the initial destkop from the host
 			int connLostCount = 0;
 			RequestScreenUpdate(true);
 
-			while (true) {
-				if (CheckIfThreadDone())
-					break;
+			while (!token.IsCancellationRequested)
+            {
+	
 
                 try {
                     // ReSharper disable once SwitchStatementMissingSomeCases
@@ -382,21 +369,20 @@ namespace VncSharp
                         case ServerClientMessageType.FramebufferUpdate:
                             var rectangles = rfb.ReadFramebufferUpdate();
 
-                            if (CheckIfThreadDone())
-                                break;
+                            if (token.IsCancellationRequested) break;
 
                             // TODO: consider gathering all update rectangles in a batch and *then* posting the event back to the main thread.
                             for (var i = 0; i < rectangles; ++i) {
                                 // Get the update rectangle's info
-                                rfb.ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out RfbEncodingType enc);
+                                var (rectangle, enc) = rfb.ReadFramebufferUpdateRectHeader();
 
                                 // Build a derived EncodedRectangle type and pull-down all the pixel info
-                                var er = factory.Build(rectangle, enc);
+                                var er = EncodedRectangle.Build(rfb, Framebuffer, rectangle, enc);
                                 er.Decode();
 
                                 // Let the UI know that an updated rectangle is available, but check
                                 // to see if the user closed things down first.
-                                if (CheckIfThreadDone() || VncUpdate == null) continue;
+                                if (token.IsCancellationRequested || VncUpdate == null) continue;
                                 var e = new VncEventArgs(er);
 
                                 VncUpdate(this, new VncEventArgs(er));
@@ -406,8 +392,7 @@ namespace VncSharp
                             //Beep();
                             break;
                         case ServerClientMessageType.ServerCutText:
-                            if (CheckIfThreadDone())
-                                break;
+
                             // TODO: This is invasive, should there be a bool property allowing this message to be ignored?
                             OnServerCutText();
                             break;
@@ -421,8 +406,10 @@ namespace VncSharp
                     connLostCount = 0;
                     
                 }
-                catch (Exception)
-                {   // On the first time of no data being received we force a complete update
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    // On the first time of no data being received we force a complete update
                     // This is for times when the server has no update, and caused the timeout.
                     if (connLostCount++ > 1)
                         OnConnectionLost();

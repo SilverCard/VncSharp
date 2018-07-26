@@ -76,12 +76,39 @@ namespace VncSharp.Encodings
 		/// Obtain all necessary information from VNC Host (i.e., read) in order to Draw the rectangle, and store in colours[].
 		/// </summary>
 		public abstract void Decode();
-		
-		/// <summary>
-		/// After calling Decode() an EncodedRectangle can be drawn to a Bitmap, which is the local representation of the remote desktop.
+
+        /// <summary>
+		/// Creates an object type derived from EncodedRectangle, based on the value of encoding.
 		/// </summary>
-		/// <param name="desktop">The image the represents the remote desktop. NOTE: this image will be altered.</param>
-		public unsafe virtual void Draw(Bitmap desktop)
+		/// <param name="r">A Rectangle object defining the bounds of the rectangle to be created</param>
+		/// <param name="encoding">An Integer indicating the encoding type to be used for this rectangle.  Used to determine the type of EncodedRectangle to create.</param>
+		/// <returns></returns>
+		public static EncodedRectangle Build(RfbProtocol rfb, Framebuffer framebuffer, Rectangle r, RfbEncodingType encoding)
+        {
+            switch (encoding)
+            {
+                case RfbEncodingType.Raw:
+                    return new RawRectangle(rfb, framebuffer, r);
+                case RfbEncodingType.CopyRect:
+                    return new CopyRectRectangle(rfb, framebuffer, r);
+                case RfbEncodingType.RRE:
+                    return new RreRectangle(rfb, framebuffer, r);
+                case RfbEncodingType.CoRRE:
+                    return new CoRreRectangle(rfb, framebuffer, r);
+                case RfbEncodingType.Hextile:
+                    return new HextileRectangle(rfb, framebuffer, r);
+                case RfbEncodingType.ZRLE:
+                    return new ZrleRectangle(rfb, framebuffer, r);
+                default:
+                    throw new InvalidOperationException($"Unsupported encoding: {encoding}.");
+            }
+        }
+
+        /// <summary>
+        /// After calling Decode() an EncodedRectangle can be drawn to a Bitmap, which is the local representation of the remote desktop.
+        /// </summary>
+        /// <param name="desktop">The image the represents the remote desktop. NOTE: this image will be altered.</param>
+        public unsafe virtual void Draw(Bitmap desktop)
 		{
 			// Lock the bitmap's scan-lines in RAM so we can iterate over them using pointers and update the area
 			// defined in rectangle.

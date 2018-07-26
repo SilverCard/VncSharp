@@ -517,16 +517,17 @@ namespace VncSharp
 		/// </summary>
 		/// <param name="rectangle">The geometry of the rectangle that is about to be sent.</param>
 		/// <param name="encoding">The encoding used for this rectangle.</param>
-		public void ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out RfbEncodingType encoding)
+		public (Rectangle, RfbEncodingType) ReadFramebufferUpdateRectHeader()
 		{
-			rectangle = new Rectangle
+			var rectangle = new Rectangle
 			{
 				X = Reader.ReadUInt16(),
 				Y = Reader.ReadUInt16(),
 				Width = Reader.ReadUInt16(),
 				Height = Reader.ReadUInt16()
 			};
-			encoding = (RfbEncodingType) Reader.ReadUInt32();
+			var encoding = (RfbEncodingType) Reader.ReadUInt32();
+            return (rectangle, encoding);
 		}
 		
 		// TODO: this colour map code should probably go in Framebuffer.cs
