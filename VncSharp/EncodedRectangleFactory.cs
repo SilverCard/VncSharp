@@ -15,6 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using VncSharp.Encodings;
@@ -46,37 +47,27 @@ namespace VncSharp
 		/// <summary>
 		/// Creates an object type derived from EncodedRectangle, based on the value of encoding.
 		/// </summary>
-		/// <param name="rectangle">A Rectangle object defining the bounds of the rectangle to be created</param>
+		/// <param name="r">A Rectangle object defining the bounds of the rectangle to be created</param>
 		/// <param name="encoding">An Integer indicating the encoding type to be used for this rectangle.  Used to determine the type of EncodedRectangle to create.</param>
 		/// <returns></returns>
-		public EncodedRectangle Build(Rectangle rectangle, int encoding)
-		{
-			EncodedRectangle e;
-
+		public EncodedRectangle Build(Rectangle r, RfbEncodingType encoding)
+		{	
 			switch (encoding) {
-				case RfbProtocol.RAW_ENCODING:
-					e = new RawRectangle(rfb, framebuffer, rectangle);
-					break;
-				case RfbProtocol.COPYRECT_ENCODING:
-					e = new CopyRectRectangle(rfb, framebuffer, rectangle);
-					break;
-				case RfbProtocol.RRE_ENCODING:
-					e = new RreRectangle(rfb, framebuffer, rectangle);
-					break;
-				case RfbProtocol.CORRE_ENCODING:
-					e = new CoRreRectangle(rfb, framebuffer, rectangle);
-					break;
-				case RfbProtocol.HEXTILE_ENCODING:
-					e = new HextileRectangle(rfb, framebuffer, rectangle);
-					break;
-				case RfbProtocol.ZRLE_ENCODING:
-					e = new ZrleRectangle(rfb, framebuffer, rectangle);				
-					break;
+				case RfbEncodingType.Raw:
+					return new RawRectangle(rfb, framebuffer, r);
+				case RfbEncodingType.CopyRect:
+                    return new CopyRectRectangle(rfb, framebuffer, r);
+				case RfbEncodingType.RRE:
+                    return new RreRectangle(rfb, framebuffer, r);
+				case RfbEncodingType.CoRRE:
+                    return new CoRreRectangle(rfb, framebuffer, r);
+				case RfbEncodingType.Hextile:
+                    return new HextileRectangle(rfb, framebuffer, r);
+				case RfbEncodingType.ZRLE:
+                    return new ZrleRectangle(rfb, framebuffer, r);				
 				default:
-					// Sanity check
-					throw new VncProtocolException("Unsupported Encoding Format received: " + encoding + ".");
-			}
-			return e;
+					throw new InvalidOperationException($"Unsupported encoding: {encoding}.");
+			}			
 		}
 	}
 }

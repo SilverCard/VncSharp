@@ -31,7 +31,7 @@ namespace VncSharp.Encodings
 		private const int SUBRECTS_COLOURED		= 0x10;
 
 		public HextileRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle)
-			: base(rfb, framebuffer, rectangle, RfbProtocol.HEXTILE_ENCODING) 
+			: base(rfb, framebuffer, rectangle, RfbEncodingType.Hextile) 
 		{
 		}
 

@@ -32,7 +32,7 @@ namespace VncSharp.Encodings
 		private readonly int[] tileBuffer = new int[TILE_WIDTH * TILE_HEIGHT];
 
 		public ZrleRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle)
-			: base(rfb, framebuffer, rectangle, RfbProtocol.ZRLE_ENCODING)
+			: base(rfb, framebuffer, rectangle, RfbEncodingType.ZRLE)
 		{
 		}
 

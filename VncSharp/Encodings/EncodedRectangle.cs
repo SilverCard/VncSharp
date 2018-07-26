@@ -31,21 +31,23 @@ namespace VncSharp.Encodings
 		protected PixelReader	preader;
 
         public Framebuffer Framebuffer { get; private set; }
+        public RfbEncodingType EncodingType { get; private set; }
 
-        public EncodedRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle, int encoding)
+        public EncodedRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle, RfbEncodingType encoding)
 		{
-			this.rfb = rfb;
-			Framebuffer = framebuffer;
-			this.rectangle = rectangle;
+			this.rfb = rfb ?? throw new ArgumentNullException(nameof(rfb));
+			Framebuffer = framebuffer ?? throw new ArgumentNullException(nameof(framebuffer));
+            this.rectangle = rectangle;
+            EncodingType = encoding;
 
-			//Select appropriate reader
-			var reader = encoding == RfbProtocol.ZRLE_ENCODING ? rfb.ZrleReader : rfb.Reader;
+            //Select appropriate reader
+            var reader = encoding == RfbEncodingType.ZRLE ? rfb.ZrleReader : rfb.Reader;
 
 			// Create the appropriate PixelReader depending on screen size and encoding
 			switch (framebuffer.BitsPerPixel)
 			{
 				case 32:
-					if (encoding == RfbProtocol.ZRLE_ENCODING)
+					if (encoding == RfbEncodingType.ZRLE)
 					{
 						preader = new CPixelReader(reader, framebuffer);
 					}
@@ -65,14 +67,10 @@ namespace VncSharp.Encodings
 			}
 		}
 
-		/// <summary>
-		/// Gets the rectangle that needs to be decoded and drawn.
-		/// </summary>
-		public Rectangle UpdateRectangle {
-			get {
-				return rectangle;
-			}
-		}
+        /// <summary>
+        /// Gets the rectangle that needs to be decoded and drawn.
+        /// </summary>
+        public Rectangle UpdateRectangle => rectangle;
 
 		/// <summary>
 		/// Obtain all necessary information from VNC Host (i.e., read) in order to Draw the rectangle, and store in colours[].

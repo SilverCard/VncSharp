@@ -25,7 +25,7 @@ namespace VncSharp.Encodings
 	public sealed class RawRectangle : EncodedRectangle
 	{
 		public RawRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle)
-			: base(rfb, framebuffer, rectangle, RfbProtocol.RAW_ENCODING)
+			: base(rfb, framebuffer, rectangle, RfbEncodingType.Raw)
 		{
 		}
 

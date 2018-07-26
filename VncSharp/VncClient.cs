@@ -291,6 +291,7 @@ namespace VncSharp
 			return response;
 		}
 
+
 		/// <summary>
 		/// Finish setting-up protocol with VNC Host.  Should be called after Connect and Authenticate (if password required).
 		/// </summary>
@@ -300,12 +301,12 @@ namespace VncSharp
 			rfb.WriteClientInitialisation(true);  // Allow the desktop to be shared
 			Framebuffer = rfb.ReadServerInit(bitsPerPixel, depth);
 
-			rfb.WriteSetEncodings(new uint[] {	RfbProtocol.ZRLE_ENCODING,
-			                                    RfbProtocol.HEXTILE_ENCODING, 
-											//	RfbProtocol.CORRE_ENCODING, // CoRRE is buggy in some hosts, so don't bother using
-												RfbProtocol.RRE_ENCODING,
-												RfbProtocol.COPYRECT_ENCODING,
-												RfbProtocol.RAW_ENCODING });
+			rfb.WriteSetEncodings(new RfbEncodingType[] {   RfbEncodingType.ZRLE,
+                                                            RfbEncodingType.Hextile, 
+											            //	RfbProtocol.CORRE_ENCODING, // CoRRE is buggy in some hosts, so don't bother using
+												            RfbEncodingType.RRE,
+                                                            RfbEncodingType.CopyRect,
+                                                            RfbEncodingType.Raw });
 
 			rfb.WriteSetPixelFormat(Framebuffer);	// set the required ramebuffer format
             
@@ -386,7 +387,7 @@ namespace VncSharp
                             // TODO: consider gathering all update rectangles in a batch and *then* posting the event back to the main thread.
                             for (var i = 0; i < rectangles; ++i) {
                                 // Get the update rectangle's info
-                                rfb.ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out int enc);
+                                rfb.ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out RfbEncodingType enc);
 
                                 // Build a derived EncodedRectangle type and pull-down all the pixel info
                                 var er = factory.Build(rectangle, enc);

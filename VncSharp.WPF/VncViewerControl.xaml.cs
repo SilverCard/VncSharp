@@ -207,7 +207,7 @@ namespace VncSharp.WPF
             var p = cpRect.Source;
             var f = cpRect.Framebuffer;
 
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 // Avoid exception if window is dragged bottom of screen
                 if (r.Top + r.Height >= f.Height)
@@ -222,8 +222,8 @@ namespace VncSharp.WPF
                 }
                 else
                 {
-                    Int32[] pixelBuf = new Int32[r.Width * r.Height];
-
+                    Int32[] pixelBuf = new Int32[r.Width * r.Height];                               
+                    
                     VncImageSource.CopyPixels(new Int32Rect(p.X, p.Y, r.Width, r.Height), pixelBuf, r.Width * 4, 0);
                     VncImageSource.WritePixels(new Int32Rect(0, 0, r.Width, r.Height), pixelBuf, r.Width * 4, r.X, r.Y);
                 }

@@ -41,15 +41,7 @@ namespace VncSharp
 		// Timeout Constants
 		public const int RECEIVE_TIMEOUT				= 15000;
 		public const int SEND_TIMEOUT					= 15000;
-		
-		// Encoding Constants
-		public const int RAW_ENCODING 					= 0;
-		public const int COPYRECT_ENCODING 				= 1;
-		public const int RRE_ENCODING 					= 2;
-		public const int CORRE_ENCODING					= 4;
-		public const int HEXTILE_ENCODING 				= 5;
-		public const int ZRLE_ENCODING 					= 16;
-
+        
 		// Server to Client Message-Type constants
 		public const int FRAMEBUFFER_UPDATE 			= 0;
 		public const int SET_COLOUR_MAP_ENTRIES			= 1;
@@ -427,7 +419,7 @@ namespace VncSharp
 		/// Tell the server which encodings are supported by the client. See RFB Doc v. 3.8 section 6.3.3.
 		/// </summary>
 		/// <param name="encodings">An array of integers indicating the encoding types supported.  The order indicates preference, where the first item is the first preferred.</param>
-		public void WriteSetEncodings(uint[] encodings)
+		public void WriteSetEncodings(RfbEncodingType[] encodings)
 		{
 			byte[] buff = new byte[(encodings.Length*4) + 4];
 			int x = 0;
@@ -437,7 +429,7 @@ namespace VncSharp
 			
 			foreach (var t in encodings)
 			{	
-				BitConverter.GetBytes(t).Reverse().ToArray().CopyTo(buff, 4+x);
+				BitConverter.GetBytes((uint)t).Reverse().ToArray().CopyTo(buff, 4+x);
 				x+=4;
 			}
 			writer.Write(buff);
@@ -539,7 +531,7 @@ namespace VncSharp
 		/// </summary>
 		/// <param name="rectangle">The geometry of the rectangle that is about to be sent.</param>
 		/// <param name="encoding">The encoding used for this rectangle.</param>
-		public void ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out int encoding)
+		public void ReadFramebufferUpdateRectHeader(out Rectangle rectangle, out RfbEncodingType encoding)
 		{
 			rectangle = new Rectangle
 			{
@@ -548,7 +540,7 @@ namespace VncSharp
 				Width = Reader.ReadUInt16(),
 				Height = Reader.ReadUInt16()
 			};
-			encoding = (int) Reader.ReadUInt32();
+			encoding = (RfbEncodingType) Reader.ReadUInt32();
 		}
 		
 		// TODO: this colour map code should probably go in Framebuffer.cs

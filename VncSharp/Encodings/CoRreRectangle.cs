@@ -27,7 +27,8 @@ namespace VncSharp.Encodings
 	/// </summary>
 	public sealed class CoRreRectangle : EncodedRectangle 
 	{
-		public CoRreRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle) : base(rfb, framebuffer, rectangle, RfbProtocol.CORRE_ENCODING)
+		public CoRreRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle) 
+            : base(rfb, framebuffer, rectangle, RfbEncodingType.CoRRE)
 		{
 		}
 

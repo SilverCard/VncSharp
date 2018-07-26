@@ -25,7 +25,7 @@ namespace VncSharp.Encodings
 	public sealed class RreRectangle : EncodedRectangle 
 	{
 		public RreRectangle(RfbProtocol rfb, Framebuffer framebuffer, Rectangle rectangle)
-			: base(rfb, framebuffer, rectangle, RfbProtocol.RRE_ENCODING) 
+			: base(rfb, framebuffer, rectangle, RfbEncodingType.RRE) 
 		{
 		}
 
