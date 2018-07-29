@@ -382,6 +382,12 @@ namespace VncSharp
 			
 			return buffer;
 		}
+
+        public void SendMessage(MessageBase message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            BinarySerializer.Serialize(message, stream);
+        }
 		
 		/// <summary>
 		/// Sends the format to be used by the server when sending Framebuffer Updates. See RFB Doc v. 3.8 section 6.3.1.
@@ -397,48 +403,6 @@ namespace VncSharp
 			buff[2] = 0x00;
 			buff[3] = 0x00;
 			buffer.ToPixelFormat().CopyTo(buff, 4);		// 16-byte Pixel Format
-			writer.Write(buff);
-			writer.Flush();
-		}
-
-		/// <summary>
-		/// Tell the server which encodings are supported by the client. See RFB Doc v. 3.8 section 6.3.3.
-		/// </summary>
-		/// <param name="encodings">An array of integers indicating the encoding types supported.  The order indicates preference, where the first item is the first preferred.</param>
-		public void WriteSetEncodings(RfbEncodingType[] encodings)
-		{
-			byte[] buff = new byte[(encodings.Length*4) + 4];
-			int x = 0;
-			buff[0] = (byte)ClientServerMessageType.SetEncodings;
-			buff[1] = 0x00;
-			BitConverter.GetBytes((ushort)encodings.Length).Reverse().ToArray().CopyTo(buff, 2);
-			
-			foreach (var t in encodings)
-			{	
-				BitConverter.GetBytes((uint)t).Reverse().ToArray().CopyTo(buff, 4+x);
-				x+=4;
-			}
-			writer.Write(buff);
-			writer.Flush();
-		}
-
-		/// <summary>
-		/// Sends a request for an update of the area specified by (x, y, w, h). See RFB Doc v. 3.8 section 6.3.4.
-		/// </summary>
-		/// <param name="x">The x-position of the area to be updated.</param>
-		/// <param name="y">The y-position of the area to be updated.</param>
-		/// <param name="width">The width of the area to be updated.</param>
-		/// <param name="height">The height of the area to be updated.</param>
-		/// <param name="incremental">Indicates whether only changes to the client's data should be sent or the entire desktop.</param>
-		public void WriteFramebufferUpdateRequest(ushort x, ushort y, ushort width, ushort height, bool incremental)
-		{
-			byte[] buff = new byte[10];
-			buff[0] = (byte)ClientServerMessageType.FramebufferUpdateRequest;
-            buff[1] = (byte)(incremental ? 1 : 0);
-			BitConverter.GetBytes((ushort)x).Reverse().ToArray().CopyTo(buff, 2);
-			BitConverter.GetBytes((ushort)y).Reverse().ToArray().CopyTo(buff, 4);
-			BitConverter.GetBytes((ushort)width).Reverse().ToArray().CopyTo(buff, 6);
-			BitConverter.GetBytes((ushort)height).Reverse().ToArray().CopyTo(buff, 8);
 			writer.Write(buff);
 			writer.Flush();
 		}
@@ -472,23 +436,6 @@ namespace VncSharp
             buff[1] = buttonMask;
 			BitConverter.GetBytes((ushort)point.X).Reverse().ToArray().CopyTo(buff, 2);
 			BitConverter.GetBytes((ushort)point.Y).Reverse().ToArray().CopyTo(buff, 4);
-			writer.Write(buff);
-			writer.Flush();
-		}
-
-		/// <summary>
-		/// Sends text in the client's Cut Buffer to the server. See RFB Doc v. 3.8 section 6.3.7.
-		/// </summary>
-		/// <param name="text">The text to be sent to the server.</param>
-		public void WriteClientCutText(string text)
-		{
-			byte[] buff = new byte[text.Length + 8];
-			buff[0] = (byte)ClientServerMessageType.ClientCutText;
-			buff[1] = 0x00;
-			buff[2] = 0x00;
-			buff[3] = 0x00;
-			BitConverter.GetBytes((uint)text.Length).Reverse().ToArray().CopyTo(buff, 4);
-			GetBytes(text).CopyTo(buff, 8);
 			writer.Write(buff);
 			writer.Flush();
 		}

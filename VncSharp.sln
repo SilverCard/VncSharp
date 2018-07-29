@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VncSharp.WPF", "VncSharp.WP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VncViewer", "VncViewer\VncViewer.csproj", "{F5A5C377-72BE-42CA-83BF-5C648137227D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VncSharp.Tests", "VncSharp.Tests\VncSharp.Tests.csproj", "{F20065CB-0C4D-4EC5-8F40-8FDBB0A65266}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5A5C377-72BE-42CA-83BF-5C648137227D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F20065CB-0C4D-4EC5-8F40-8FDBB0A65266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F20065CB-0C4D-4EC5-8F40-8FDBB0A65266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F20065CB-0C4D-4EC5-8F40-8FDBB0A65266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F20065CB-0C4D-4EC5-8F40-8FDBB0A65266}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
